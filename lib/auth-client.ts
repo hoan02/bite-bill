@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { createAuthClient } from "better-auth/react";
 export const {
   signIn,
@@ -8,5 +9,6 @@ export const {
   resetPassword,
 } = createAuthClient({
   /** the base url of the server (optional if you're using the same domain) */
-  baseURL: "http://localhost:3000",
+  baseURL: env.BETTER_AUTH_URL,
+
 });
