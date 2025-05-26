@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { env } from "@/env";
 import { sendEmail } from "./email";
+import { headers } from "next/headers";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -55,3 +56,13 @@ export const auth = betterAuth({
 
   plugins: [nextCookies()],
 });
+
+export async function currentUser() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session || !session.user) return null;
+
+  return session.user;
+}

@@ -7,7 +7,7 @@ import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { signUp } from "@/lib/actions/auth";
+import { signUp } from "@/lib/actions/auth.action";
 
 export default function SignupForm() {
   const initialState = { errorMessage: "" };

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { searchAccount } from "@/lib/actions/auth";
+import { searchAccount } from "@/lib/actions/auth.action";
 
 export default function ForgotAccountPage() {
   const [email, setEmail] = useState("");

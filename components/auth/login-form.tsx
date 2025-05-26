@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
-import { signIn } from "@/lib/actions/auth";
+import { signIn } from "@/lib/actions/auth.action";
 
 export default function LoginForm() {
   const initialState = { errorMessage: "" };
