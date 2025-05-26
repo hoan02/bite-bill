@@ -1,10 +1,15 @@
+import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "@/lib/prisma";
 import { nextCookies } from "better-auth/next-js";
+import {
+  admin as adminPlugin,
+  organization as organizationPlugin,
+} from "better-auth/plugins";
+import { prisma } from "@/lib/prisma";
 import { env } from "@/env";
 import { sendEmail } from "./email";
-import { headers } from "next/headers";
+import { ac, admin, user } from "@/lib/permissions";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -54,7 +59,22 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    adminPlugin({
+      ac,
+      roles: {
+        admin,
+        user,
+      },
+    }),
+    organizationPlugin({
+      // allowUserToCreateOrganization: async (user) => {
+      //   const subscription = await getSubscription(user.id);
+      //   return subscription.plan === "pro";
+      // },
+    }),
+  ],
 });
 
 export async function currentUser() {

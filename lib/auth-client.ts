@@ -1,4 +1,7 @@
 import { createAuthClient } from "better-auth/react";
+import { adminClient, organizationClient } from "better-auth/client/plugins";
+import { ac, admin, user, myCustomRole } from "@/lib/permissions";
+
 export const {
   signIn,
   signUp,
@@ -7,5 +10,15 @@ export const {
   forgetPassword,
   resetPassword,
 } = createAuthClient({
-  /** the base url of the server (optional if you're using the same domain) */
+  plugins: [
+    adminClient({
+      ac,
+      roles: {
+        admin,
+        user,
+        myCustomRole,
+      },
+    }),
+    organizationClient(),
+  ],
 });
