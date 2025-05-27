@@ -1,4 +1,4 @@
-import FormJoinOrg from "@/components/org/form-join-org";
+import FormJoinOrg from "@/components/org/join-org-form";
 
 export default function TeamPage() {
   return (

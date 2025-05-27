@@ -1,4 +1,4 @@
-import FormCreateOrg from "@/components/org/form-create-org";
+import FormCreateOrg from "@/components/org/create-org-form";
 import React from "react";
 
 const CreateOrgPage = () => {

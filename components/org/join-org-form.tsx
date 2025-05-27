@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+// import { useActionState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
@@ -16,14 +16,14 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { joinOrg } from "@/lib/actions/org.action";
+// import { joinOrg } from "@/lib/actions/org.action";
 
-const FormJoinOrg = () => {
-  const initialState = { errorMessage: "" };
+const JoinOrgForm = () => {
+  // const initialState = { errorMessage: "" };
   // const [state, formAction, pending] = useActionState(joinOrg, initialState);
 
   // useEffect(() => {
@@ -88,4 +88,4 @@ const FormJoinOrg = () => {
   );
 };
 
-export default FormJoinOrg;
+export default JoinOrgForm;

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { orgSchema, OrgFormData } from "@/lib/schemas/org";
 import {
   Form,
   FormControl,
@@ -23,45 +23,37 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { createOrg } from "@/lib/actions/org.action";
 
-// Define the schema using zod
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  slug: z
-    .string()
-    .min(1, "Slug is required")
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Slug must contain only lowercase letters, numbers, and hyphens"
-    ),
-  description: z.string().optional(),
-  logo: z.any().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const FormCreateOrg = () => {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+const CreateOrgForm = () => {
+  const form = useForm<OrgFormData>({
+    resolver: zodResolver(orgSchema),
     defaultValues: {
       name: "",
       slug: "",
       description: "",
-      logo: null,
+      // logo: null,
     },
   });
 
-  const { handleSubmit, control, formState, reset } = form;
-  const { errors } = formState;
+  const { handleSubmit, control, reset } = form;
 
-  const onSubmit = (data: FormData) => {
-    console.log("data", data);
-    // Simulate form submission
-    toast({
-      title: "Success",
-      description: `Team "${data.name}" created successfully!`,
-    });
+  const onSubmit = async (data: OrgFormData) => {
+    const result = await createOrg(data);
     reset();
+
+    if (!result.success) {
+      toast({
+        title: "Lỗi",
+        description: "Tạo tổ chức thất bại",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Thành công",
+        description: "Tổ chức đã được tạo",
+      });
+    }
   };
 
   return (
@@ -84,11 +76,7 @@ const FormCreateOrg = () => {
                   <FormControl>
                     <Input placeholder="Team Name" {...field} />
                   </FormControl>
-                  <FormMessage>
-                    {typeof errors.name?.message === "string"
-                      ? errors.name.message
-                      : null}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -102,11 +90,7 @@ const FormCreateOrg = () => {
                   <FormControl>
                     <Input placeholder="my-team" {...field} />
                   </FormControl>
-                  <FormMessage>
-                    {typeof errors.slug?.message === "string"
-                      ? errors.slug.message
-                      : null}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -120,16 +104,12 @@ const FormCreateOrg = () => {
                   <FormControl>
                     <Textarea placeholder="Describe your team..." {...field} />
                   </FormControl>
-                  <FormMessage>
-                    {typeof errors.description?.message === "string"
-                      ? errors.description.message
-                      : null}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
+            {/* <FormField
               name="logo"
               control={control}
               render={({ field }) => (
@@ -138,20 +118,21 @@ const FormCreateOrg = () => {
                   <FormControl>
                     <Input
                       type="file"
+                      accept="image/*"
                       onChange={(e) => field.onChange(e.target.files)}
                     />
                   </FormControl>
-                  <FormMessage>
-                    {typeof errors.logo?.message === "string"
-                      ? errors.logo.message
-                      : null}
-                  </FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+              className="w-full"
+            >
               Create Team
             </Button>
           </CardFooter>
@@ -161,4 +142,4 @@ const FormCreateOrg = () => {
   );
 };
 
-export default FormCreateOrg;
+export default CreateOrgForm;

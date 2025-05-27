@@ -1,66 +1,79 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { APIError } from "better-auth/api";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { State } from "@/lib/types/state-form";
 import { organization } from "@/lib/auth-client";
 import { generateCodeFromSlug } from "@/lib/utils/generate-code-from-slug";
+import { OrgFormData, orgSchema } from "@/lib/schemas/org";
 
-export async function createOrg(prevState: State, formData: FormData) {
-  const rawFormData = {
-    name: formData.get("name") as string,
-    slug: formData.get("slug") as string,
-    logo: formData.get("logo") as string | null,
-  };
-
-  const joinCode = generateCodeFromSlug(rawFormData.slug);
-
+export async function createOrg(data: OrgFormData) {
   try {
-    // Gọi API để tạo tổ chức
-    await organization.create({
-      name: rawFormData.name,
-      slug: rawFormData.slug,
-      logo: rawFormData.logo || "",
+    const { name, slug, description } = data;
+
+    // Validate bằng Zod schema
+    const parsed = orgSchema.safeParse({
+      name,
+      slug,
+      description,
+      // logo: logoFile?.name ?? "",
     });
 
-    // Cập nhật joinCode trong database
+    if (!parsed.success) {
+      return {
+        success: false,
+        errorMessage: "Invalid form data",
+        errors: parsed.error.flatten().fieldErrors,
+      };
+    }
+
+    const { name: orgName, slug: orgSlug } = parsed.data;
+    const joinCode = generateCodeFromSlug(orgSlug!);
+
+    // Gọi API BetterAuth
+    const createdOrg = await organization.create({
+      name: orgName,
+      slug: orgSlug!,
+      logo: "", // Chưa xử lý upload logo file, để rỗng
+    });
+
+    // Cập nhật joinCode vào DB
     await prisma.organization.update({
-      where: { slug: rawFormData.slug },
+      where: { slug: orgSlug },
       data: {
         joinCode,
       },
     });
+
+    return {
+      success: true,
+      data: createdOrg,
+    };
+
   } catch (error) {
     if (error instanceof APIError) {
       switch (error.status) {
         case "UNAUTHORIZED":
-          console.error("API Error: Unauthorized access.");
           return {
-            errorMessage: "User is not authorized. Please log in again.",
+            success: false,
+            errorMessage: "Bạn chưa đăng nhập. Vui lòng đăng nhập lại.",
           };
         case "BAD_REQUEST":
-          console.error("API Error: Bad request.");
           return {
-            errorMessage:
-              "Invalid input. Please check your data and try again.",
+            success: false,
+            errorMessage: "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.",
           };
         default:
-          console.error("API Error: An unexpected error occurred.", error);
           return {
-            errorMessage: "Unexpected error occurred. Please try again later.",
+            success: false,
+            errorMessage: "Đã xảy ra lỗi không xác định.",
           };
       }
     }
 
-    // Log lỗi không xác định và ném lại
-    console.error("Unexpected Error:", error);
-    throw error;
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      errorMessage: "Đã có lỗi xảy ra. Vui lòng thử lại sau.",
+    };
   }
-
-  // Chuyển hướng người dùng sau khi thành công
-  redirect("/dashboard");
 }
-
-export async function joinOrg() {}
