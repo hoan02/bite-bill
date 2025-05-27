@@ -9,6 +9,7 @@ export const {
   useSession,
   forgetPassword,
   resetPassword,
+  organization
 } = createAuthClient({
   plugins: [
     adminClient({
